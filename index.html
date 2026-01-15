@@ -807,16 +807,6 @@
                     if (mobileHigh24h) mobileHigh24h.textContent = `$${high.toFixed(2)}`;
                     if (mobileLow24h) mobileLow24h.textContent = `$${low.toFixed(2)}`;
                     if (mobileVolume24h) mobileVolume24h.textContent = `$${(pair.volume / 1000000000).toFixed(2)}B`;
-
-                    // Close mobile drawer after selection
-                    const mobilePairsDrawer = document.getElementById('mobile-pairs-drawer');
-                    const mobilePairsOverlay = document.getElementById('mobile-pairs-overlay');
-                    if (mobilePairsDrawer && mobilePairsOverlay) {
-                        mobilePairsDrawer.classList.add('-translate-x-full');
-                        setTimeout(() => {
-                            mobilePairsOverlay.classList.add('hidden');
-                        }, 300);
-                    }
                 }
                 
                 this.renderPairs();
