@@ -1399,7 +1399,7 @@
             }
         }
 
-        // Enhanced Order Book Manager
+        // CRITICAL FIX: Enhanced Order Book Manager with Mobile Support
         class OrderBookManager {
             constructor() {
                 this.init();
@@ -1407,6 +1407,7 @@
 
             init() {
                 this.renderOrderBook();
+                this.renderMobileOrderBook(); // NEW: Render mobile order book on initialization
                 this.startUpdates();
                 this.setupTabSwitching();
             }
@@ -1415,6 +1416,18 @@
                 document.querySelectorAll('.orderbook-tab').forEach(tab => {
                     tab.addEventListener('click', (e) => {
                         document.querySelectorAll('.orderbook-tab').forEach(t => {
+                            t.classList.remove('text-[#E6EEF5]', 'border-b-2', 'border-[#2DD4BF]');
+                            t.classList.add('text-[#6B7C8B]');
+                        });
+                        e.target.classList.remove('text-[#6B7C8B]');
+                        e.target.classList.add('text-[#E6EEF5]', 'border-b-2', 'border-[#2DD4BF]');
+                    });
+                });
+
+                // NEW: Setup mobile order book tab switching
+                document.querySelectorAll('.mobile-orderbook-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        document.querySelectorAll('.mobile-orderbook-tab').forEach(t => {
                             t.classList.remove('text-[#E6EEF5]', 'border-b-2', 'border-[#2DD4BF]');
                             t.classList.add('text-[#6B7C8B]');
                         });
@@ -1451,6 +1464,34 @@
                 }
             }
 
+            // NEW: Mobile-specific order book rendering
+            renderMobileOrderBook() {
+                const mobileSellContainer = document.getElementById('mobile-sell-orders');
+                const mobileBuyContainer = document.getElementById('mobile-buy-orders');
+
+                if (mobileSellContainer) {
+                    mobileSellContainer.innerHTML = orderBookData.sellOrders.map(order => `
+                        <div class="grid grid-cols-3 gap-2 text-[11px] text-[#E05858] relative overflow-hidden py-1.5">
+                            <div class="absolute inset-0 bg-[rgba(224,88,88,0.08)] origin-right" style="width: ${(order.size / 4) * 100}%"></div>
+                            <span class="relative z-10 text-left font-mono font-medium">${order.price.toFixed(3)}</span>
+                            <span class="relative z-10 text-right font-mono">${order.size.toFixed(3)}</span>
+                            <span class="relative z-10 text-right font-mono">${order.total.toFixed(3)}</span>
+                        </div>
+                    `).join('');
+                }
+
+                if (mobileBuyContainer) {
+                    mobileBuyContainer.innerHTML = orderBookData.buyOrders.map(order => `
+                        <div class="grid grid-cols-3 gap-2 text-[11px] text-[#1FD38A] relative overflow-hidden py-1.5">
+                            <div class="absolute inset-0 bg-[rgba(31,211,138,0.08)] origin-right" style="width: ${(order.size / 4) * 100}%"></div>
+                            <span class="relative z-10 text-left font-mono font-medium">${order.price.toFixed(3)}</span>
+                            <span class="relative z-10 text-right font-mono">${order.size.toFixed(3)}</span>
+                            <span class="relative z-10 text-right font-mono">${order.total.toFixed(3)}</span>
+                        </div>
+                    `).join('');
+                }
+            }
+
             startUpdates() {
                 setInterval(() => {
                     orderBookData.sellOrders.forEach(order => {
@@ -1464,6 +1505,7 @@
                         order.total = order.price * order.size;
                     });
                     this.renderOrderBook();
+                    this.renderMobileOrderBook(); // NEW: Also update mobile order book
                 }, 1500);
 
                 setInterval(() => {
@@ -1496,6 +1538,7 @@
                     }
 
                     this.renderOrderBook();
+                    this.renderMobileOrderBook(); // NEW: Also update mobile order book
                 }, 3000);
             }
         }
