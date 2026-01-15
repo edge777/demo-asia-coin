@@ -266,15 +266,7 @@
                     
                     <!-- RIGHT SECTION: Chart Controls -->
                     <div class="flex items-center gap-2 h-full py-4">
-                        
-                        <button class="timeframe-btn active" data-timeframe="1h">1h</button>
-                        
-                        <button class="flex items-center gap-1 px-3 py-1.5 text-[13px] text-[#9FB0BF] hover:text-[#E6EEF5] border border-[#1F2A33] rounded-lg transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                            </svg>
-                            Indicators
-                        </button>
+
                     </div>
                 </div>
             </div>
@@ -836,22 +828,22 @@
     </div>
 </section>
 
-    <!-- Main JavaScript -->
+    <!-- Main JavaScript - Mobile Touch Event Support -->
     <script>
-        // Configuration matching Figma specifications
+        // Configuration matching Figma specifications - FIXED for proper chart boundaries
         const CONFIG = {
             candleWidth: 6,
             candleGap: 2,
             volumeHeight: 80,
             chartPadding: {
                 top: 80,
-                right: 60,
+                right: 60,  // INCREASED from 15 to 60 - provides proper space for price axis labels and prevents candle cutoff
                 bottom: 100,
                 left: 70
             },
             mobilePadding: {
                 top: 40,
-                right: 30,
+                right: 45,  // INCREASED from 15 to 45 - ensures price labels don't clip and candles are fully visible
                 bottom: 60,
                 left: 40
             },
@@ -960,7 +952,7 @@
             ]
         };
 
-        // Trading Chart Class
+        // Trading Chart Class with MOBILE TOUCH SUPPORT
         class TradingChart {
             constructor(canvasId, isMobile = false) {
                 this.canvas = document.getElementById(canvasId);
@@ -971,6 +963,7 @@
                 this.timeframe = '1h';
                 this.crosshair = { x: null, y: null };
                 this.isMobile = isMobile;
+                this.touchActive = false; // Track touch state
                 
                 this.init();
             }
@@ -1016,11 +1009,94 @@
             }
 
             setupEventListeners() {
-                if (!this.isMobile) {
+                if (this.isMobile) {
+                    // Mobile touch events for interactive chart
+                    this.canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
+                    this.canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
+                    this.canvas.addEventListener('touchend', (e) => this.handleTouchEnd(e));
+                    this.canvas.addEventListener('touchcancel', (e) => this.handleTouchEnd(e));
+                } else {
+                    // Desktop mouse events
                     this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
                     this.canvas.addEventListener('mouseleave', () => this.handleMouseLeave());
                 }
                 window.addEventListener('resize', () => this.handleResize());
+            }
+
+            // NEW: Handle touch start for mobile
+            handleTouchStart(e) {
+                e.preventDefault();
+                this.touchActive = true;
+                const touch = e.touches[0];
+                const rect = this.canvas.getBoundingClientRect();
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                
+                this.crosshair.x = x;
+                this.crosshair.y = y;
+                this.draw();
+                
+                // Show price details on mobile
+                this.showMobileTooltip(touch.clientX, touch.clientY);
+            }
+
+            // NEW: Handle touch move for mobile
+            handleTouchMove(e) {
+                e.preventDefault();
+                if (!this.touchActive) return;
+                
+                const touch = e.touches[0];
+                const rect = this.canvas.getBoundingClientRect();
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                
+                this.crosshair.x = x;
+                this.crosshair.y = y;
+                this.draw();
+                
+                // Update price details on mobile
+                this.showMobileTooltip(touch.clientX, touch.clientY);
+            }
+
+            // NEW: Handle touch end for mobile
+            handleTouchEnd(e) {
+                this.touchActive = false;
+                // Keep the tooltip visible for 2 seconds after touch ends on mobile
+                setTimeout(() => {
+                    if (!this.touchActive) {
+                        this.crosshair.x = null;
+                        this.crosshair.y = null;
+                        this.hideTooltip();
+                        this.draw();
+                    }
+                }, 2000);
+            }
+
+            // NEW: Mobile-specific tooltip display
+            showMobileTooltip(clientX, clientY) {
+                const rect = this.canvas.getBoundingClientRect();
+                const x = clientX - rect.left;
+                
+                const index = this.getIndexFromX(x);
+                
+                if (index >= 0 && index < this.data.length) {
+                    const candle = this.data[index];
+                    const tooltip = document.getElementById('chart-tooltip');
+                    
+                    if (tooltip) {
+                        document.getElementById('tooltip-time').textContent = new Date(candle.time).toLocaleString();
+                        document.getElementById('tooltip-open').textContent = '$' + candle.open.toFixed(3);
+                        document.getElementById('tooltip-high').textContent = '$' + candle.high.toFixed(3);
+                        document.getElementById('tooltip-low').textContent = '$' + candle.low.toFixed(3);
+                        document.getElementById('tooltip-close').textContent = '$' + candle.close.toFixed(3);
+                        document.getElementById('tooltip-volume').textContent = (candle.volume / 1000).toFixed(2) + 'K';
+                        
+                        // Position tooltip above finger for better visibility on mobile
+                        tooltip.style.left = `${Math.min(Math.max(x - 75, 10), this.width - 160)}px`;
+                        tooltip.style.top = `${Math.max(40, clientY - rect.top - 140)}px`;
+                        tooltip.classList.remove('hidden');
+                    }
+                }
             }
 
             handleMouseMove(e) {
@@ -1133,7 +1209,8 @@
                 this.drawPriceAxis(priceRange, chartHeight, padding);
                 this.drawTimeAxis(visibleData, startIndex, padding);
                 
-                if (this.crosshair.x !== null && !this.isMobile) {
+                // Show crosshair on mobile when touch is active OR on desktop with mouse
+                if (this.crosshair.x !== null && (this.isMobile ? this.touchActive : true)) {
                     this.drawCrosshair(chartHeight, padding);
                 }
             }
@@ -1816,7 +1893,7 @@
             // Desktop chart
             const chart = new TradingChart('trading-chart', false);
             
-            // Mobile chart
+            // Mobile chart with touch support
             const mobileChart = new TradingChart('mobile-trading-chart', true);
             
             // Shared components
