@@ -4,20 +4,234 @@
 
 @layer base {
   :root {
-    --color-emerald-400: 52 211 153;
-    --color-emerald-500: 16 185 129;
-    --color-emerald-600: 5 150 105;
-    --color-zinc-900: 24 24 27;
-    --color-zinc-950: 9 9 11;
+    /* Background Colors */
+    --bg-primary: #0B131A;
+    --bg-panel: #0F1B23;
+    --bg-elevated: #121F29;
+    
+    /* Border Colors */
+    --border-subtle: #1F2A33;
+    --border-divider: #23313B;
+    
+    /* Text Colors */
+    --text-primary: #E6EEF5;
+    --text-secondary: #9FB0BF;
+    --text-muted: #6B7C8B;
+    --text-disabled: #465564;
+    
+    /* Market Colors */
+    --market-green-primary: #1FD38A;
+    --market-green-soft: rgba(31, 211, 138, 0.15);
+    --market-red-primary: #E05858;
+    --market-red-soft: rgba(224, 88, 88, 0.15);
+    
+    /* Accent Colors */
+    --accent-teal: #2DD4BF;
+    --accent-cyan: #22D3EE;
+    
+    /* Component Sizes */
+    --top-nav-height: 56px;
+    --left-toolbar-width: 48px;
+    --right-panel-width: 360px;
+    --chart-volume-height: 80px;
+    --bottom-panel-height: 160px;
+    
+    /* Spacing */
+    --spacing-2: 2px;
+    --spacing-4: 4px;
+    --spacing-8: 8px;
+    --spacing-12: 12px;
+    --spacing-16: 16px;
+    --spacing-24: 24px;
+    --spacing-32: 32px;
+    --spacing-48: 48px;
+    
+    /* Border Radius */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-pill: 999px;
   }
 
   body {
-    font-family: 'Space Grotesk', 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-feature-settings: 'tnum' 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
   }
 
   * {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  /* Top Navigation */
+  .top-nav {
+    height: var(--top-nav-height);
+    background-color: var(--bg-panel);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .nav-item {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 18px;
+    color: var(--text-secondary);
+    transition: color 0.2s;
+  }
+
+  .nav-item:hover {
+    color: var(--text-primary);
+  }
+
+  /* Buttons */
+  .btn-primary {
+    background-color: var(--accent-teal);
+    color: var(--bg-primary);
+    height: 40px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .btn-primary:hover {
+    opacity: 0.9;
+  }
+
+  .btn-wallet {
+    height: 32px;
+    border-radius: var(--radius-pill);
+    background-color: var(--accent-teal);
+    color: var(--bg-primary);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0 var(--spacing-16);
+  }
+
+  /* Chart */
+  .chart-container {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+  }
+
+  .chart-candle-bull {
+    fill: var(--market-green-primary);
+  }
+
+  .chart-candle-bear {
+    fill: var(--market-red-primary);
+  }
+
+  .chart-grid-horizontal {
+    stroke: var(--border-subtle);
+  }
+
+  /* Order Book */
+  .orderbook-row {
+    height: 28px;
+    font-size: 13px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .orderbook-ask-bg {
+    background-color: var(--market-red-soft);
+  }
+
+  .orderbook-bid-bg {
+    background-color: var(--market-green-soft);
+  }
+
+  /* Panels */
+  .panel {
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+  }
+
+  .panel-elevated {
+    background-color: var(--bg-elevated);
+  }
+
+  /* Market Pair Title */
+  .market-pair-title {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 24px;
+  }
+
+  /* Body Stats */
+  .body-stats {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 18px;
+  }
+
+  /* Uppercase Labels */
+  .label-uppercase {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Orderbook Prices */
+  .orderbook-price {
+    font-size: 13px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Slider */
+  .slider-track {
+    background-color: var(--border-divider);
+  }
+
+  .slider-fill {
+    background-color: var(--accent-teal);
+  }
+
+  .slider-knob {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Timeframe Buttons */
+  .timeframe-btn {
+    font-size: 13px;
+    font-weight: 500;
+    padding: var(--spacing-8) var(--spacing-12);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s;
+  }
+
+  .timeframe-btn:hover {
+    background-color: var(--bg-elevated);
+  }
+
+  .timeframe-btn.active {
+    border-color: var(--accent-teal);
+    background-color: rgba(45, 212, 191, 0.12);
+    color: var(--accent-teal);
+  }
+
+  /* Timeframe Buttons - Chart Top Left Controls */
+  .chart-timeframe-btn {
+    @apply px-2 py-0.5 text-[11px] font-medium text-[#6B7C8B] hover:text-[#E6EEF5] transition-colors;
+  }
+  
+  .chart-timeframe-btn.active {
+    @apply text-[#E6EEF5] relative;
+  }
+  
+  .chart-timeframe-btn.active::after {
+    content: '';
+    @apply absolute bottom-0 left-0 right-0 h-0.5 bg-[#2DD4BF];
   }
 }
 
@@ -43,5 +257,36 @@
   .backdrop-blur-sm {
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
+  }
+
+  /* Design Token Utilities */
+  .bg-primary { background-color: var(--bg-primary); }
+  .bg-panel { background-color: var(--bg-panel); }
+  .bg-elevated { background-color: var(--bg-elevated); }
+  
+  .border-subtle { border-color: var(--border-subtle); }
+  .border-divider { border-color: var(--border-divider); }
+  
+  .text-primary { color: var(--text-primary); }
+  .text-secondary { color: var(--text-secondary); }
+  .text-muted { color: var(--text-muted); }
+  .text-disabled { color: var(--text-disabled); }
+  
+  .text-market-green { color: var(--market-green-primary); }
+  .text-market-red { color: var(--market-red-primary); }
+  .bg-market-green-soft { background-color: var(--market-green-soft); }
+  .bg-market-red-soft { background-color: var(--market-red-soft); }
+  
+  .text-accent-teal { color: var(--accent-teal); }
+  .bg-accent-teal { background-color: var(--accent-teal); }
+  
+  .rounded-sm { border-radius: var(--radius-sm); }
+  .rounded-md { border-radius: var(--radius-md); }
+  .rounded-lg { border-radius: var(--radius-lg); }
+  .rounded-pill { border-radius: var(--radius-pill); }
+  
+  /* Tabular Numerals */
+  .font-tabular {
+    font-variant-numeric: tabular-nums;
   }
 }

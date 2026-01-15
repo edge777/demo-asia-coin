@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Additional custom Tailwind CSS */
+@layer components {
+    .timeframe-btn {
+        @apply px-3 py-1.5 text-[13px] text-[#9FB0BF] hover:text-[#E6EEF5] border border-[#1F2A33] rounded-lg transition-colors;
+    }
+
+    .timeframe-btn.active {
+        @apply bg-[#2DD4BF] text-[#0B131A] border-[#2DD4BF];
+    }
+}
